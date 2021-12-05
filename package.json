@@ -1,0 +1,37 @@
+{
+  "name": "purescript-elmish-enzyme",
+  "version": "1.0.0",
+  "description": "A testing library for Elmish which uses Enzyme",
+  "main": "index.js",
+  "scripts": {
+    "test": "spago -x test.dhall test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/collegevine/purescript-elmish-enzyme.git"
+  },
+  "keywords": [
+    "PureScript",
+    "Elmish",
+    "Test",
+    "Enzyme"
+  ],
+  "author": "Marc Cordova",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/collegevine/purescript-elmish-enzyme/issues"
+  },
+  "homepage": "https://github.com/collegevine/purescript-elmish-enzyme#readme",
+  "devDependencies": {
+    "purescript": "^0.14.5",
+    "spago": "^0.20.3"
+  },
+  "dependencies": {
+    "@wojtekmaj/enzyme-adapter-react-17": "^0.6.5",
+    "enzyme": "^3.11.0",
+    "global-jsdom": "^8.4.0",
+    "jsdom": "^16.5.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  }
+}
