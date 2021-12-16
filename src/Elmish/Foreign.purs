@@ -16,6 +16,8 @@ module Elmish.Enzyme.Foreign
   , forEach
   , is
   , length
+  , name
+  , parent
   , prop
   , setState
   , simulate
@@ -120,6 +122,12 @@ exists selector w = liftEffect $ runEffectFn2 exists_ selector w
 find :: forall m. MonadEffect m => String -> ElementWrapper -> m ElementWrapper
 find selector w = liftEffect $ runEffectFn2 find_ selector w
 
+-- | Returns parent of the given `ElementWrapper`. See
+-- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/parent.html for
+-- | more info.
+parent :: forall m. MonadEffect m => ElementWrapper -> m ElementWrapper
+parent w = liftEffect $ runEffectFn1 parent_ w
+
 -- | Returns a `Boolean` indicating whether the given `ElementWrapper` matches
 -- | the given selector.
 -- | See https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/is.html
@@ -183,6 +191,12 @@ state = liftEffect <<< runEffectFn1 state_
 text :: forall m. MonadEffect m => ElementWrapper -> m String
 text = liftEffect <<< runEffectFn1 text_
 
+-- | Returns tag name of the given `ElementWrapper`.
+-- | See https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/name.html
+-- | for more info.
+name :: forall m. MonadEffect m => ElementWrapper -> m String
+name = liftEffect <<< runEffectFn1 name_
+
 -- | Returns the number of times a given selector appears within a wrapper.
 count :: forall m. MonadEffect m => String -> ElementWrapper -> m Int
 count selector wrapper = do
@@ -218,6 +232,8 @@ foreign import exists_ :: EffectFn2 String ElementWrapper Boolean
 
 foreign import find_ :: EffectFn2 String ElementWrapper ElementWrapper
 
+foreign import parent_ :: EffectFn1 ElementWrapper ElementWrapper
+
 foreign import is_ :: EffectFn2 String ElementWrapper Boolean
 
 foreign import prop_ :: forall a. EffectFn2 String ElementWrapper a
@@ -231,6 +247,8 @@ foreign import simulateCustom_ :: EffectFn3 String Foreign ElementWrapper Unit
 foreign import state_ :: EffectFn1 ElementWrapper Foreign
 
 foreign import text_ :: EffectFn1 ElementWrapper String
+
+foreign import name_ :: EffectFn1 ElementWrapper String
 
 foreign import unmount_ :: EffectFn1 ElementWrapper Unit
 

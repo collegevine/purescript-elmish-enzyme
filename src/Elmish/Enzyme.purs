@@ -10,11 +10,16 @@ module Elmish.Enzyme
   , testElement
   , at
   , clickOn
+  , count
   , debug
   , exists
   , find
   , findSingle
+  , forEach
   , is
+  , mapEach
+  , name
+  , parent
   , prop
   , setState
   , simulate
@@ -22,7 +27,7 @@ module Elmish.Enzyme
   , simulateCustom'
   , state
   , text
-  , count
+  , toArray
   , trace
   , update
   , waitUntil
@@ -37,6 +42,8 @@ module Elmish.Enzyme
 import Prelude
 
 import Control.Monad.Reader (ReaderT, ask, runReaderT, withReaderT)
+import Data.Traversable (traverse)
+import Debug (class DebugWarning)
 import Effect.Aff (Aff, Milliseconds(..), delay)
 import Effect.Aff.Class (class MonadAff, liftAff)
 import Effect.Class (liftEffect)
@@ -88,11 +95,11 @@ at index = E.at index =<< ask
 -- | Returns the string representing the DOM tree of the current element. See
 -- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/debug.html for more
 -- | info.
-debug :: EnzymeM String
+debug :: DebugWarning => EnzymeM String
 debug = E.debug =<< ask
 
 -- | Logs a string representing the DOM tree of the current element.
-trace :: EnzymeM Unit
+trace :: DebugWarning => EnzymeM Unit
 trace = log =<< debug
 
 -- | Returns a `Boolean` indicating whether a given selector exists within the
@@ -107,6 +114,12 @@ exists selector = E.exists selector =<< ask
 -- | more info.
 find :: String -> EnzymeM ElementWrapper
 find selector = E.find selector =<< ask
+
+-- | Returns parent of the current element. See
+-- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/find.html for
+-- | more info.
+parent :: EnzymeM ElementWrapper
+parent = E.parent =<< ask
 
 -- | Finds a single element with the given selector within the current element
 -- | (see also `find`). Crashes if no elements or more than one elements could
@@ -183,6 +196,12 @@ state = E.state =<< ask
 text :: EnzymeM String
 text = E.text =<< ask
 
+-- | Returns tag name of the current element.
+-- | See https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/name.html
+-- | for more info.
+name :: EnzymeM String
+name = E.name =<< ask
+
 -- | Returns the number of times a given selector appears.
 count :: String -> EnzymeM Int
 count selector = E.count selector =<< ask
@@ -229,6 +248,37 @@ withElementM :: forall a. EnzymeM ElementWrapper -> EnzymeM a -> EnzymeM a
 withElementM el f = el >>= \e -> withElement e f
 
 infixl 1 withElementM as >>
+
+-- | Basically, a DSL-friendly equivalent of `map`: for each element in the
+-- | current `ElementWrapper` performs the given action and returns all results
+-- | of that action as an array.
+-- |
+-- | Example:
+-- |
+-- |     allNames <- find ".t--foo" >> mapEach text
+-- |     allValues <- find ".t--foo" >> mapEach (prop "value")
+-- |
+mapEach :: forall a. EnzymeM a -> EnzymeM (Array a)
+mapEach f = toArray >>= traverse \e -> withElement e f
+
+-- | Returns all elements contained in the current `ElementWrapper` as an array.
+toArray :: EnzymeM (Array ElementWrapper)
+toArray = E.toArray =<< ask
+
+-- | Basically, a DSL-friendly equivalent of `for_`: for each element in the
+-- | current `ElementWrapper` performs the given effect.
+-- |
+-- | Example:
+-- |
+-- |     find "button" >> forEach (simulate "click")
+-- |
+-- |     find ".t--foo" >> forEach do
+-- |       find "input[type=text]" >> simulate' "change" { target: { value: "new text" } }
+-- |       find "input[type=checkbox]" >> simulate "change"
+-- |       find ".t--bar" >> text >>= shouldEqual "qux"
+-- |
+forEach :: EnzymeM Unit -> EnzymeM Unit
+forEach f = E.forEach (\e -> withElement e f) =<< ask
 
 -- | A convenience function which finds an element for the given selector and
 -- | passes it to `withElement`.

@@ -17,6 +17,8 @@ exports.exists_ = (selector, wrapper) => wrapper.exists(selector)
 
 exports.find_ = (selector, wrapper) => wrapper.find(selector)
 
+exports.parent_ = wrapper => wrapper.parent()
+
 exports.is_ = (selector, wrapper) => wrapper.is(selector)
 
 exports.length = wrapper => wrapper.length
@@ -40,6 +42,8 @@ exports.simulateCustom_ = (eventType, event, wrapper) => wrapper.getElement().pr
 exports.state_ = (wrapper) => wrapper.state()
 
 exports.text_ = (wrapper) => wrapper.text()
+
+exports.name_ = (wrapper) => wrapper.name()
 
 exports.unmount_ = (wrapper) => wrapper.unmount()
 
