@@ -10,7 +10,6 @@ import Elmish.Enzyme (clickOn, exists, find, prop, simulate', testComponent, tes
 import Elmish.Enzyme as Enzyme
 import Elmish.Foreign (readForeign)
 import Elmish.HTML.Styled as H
-import Foreign (unsafeToForeign)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 import Test.Spec.Reporter.Spec (specReporter)
@@ -61,7 +60,7 @@ spec = do
       testComponent def do
         find ".baz" >> do
           prop "value" >>= shouldEqual ""
-          simulate' "change" $ unsafeToForeign { target: { value: "New text" } }
+          simulate' "change" { target: { value: "New text" } }
         find ".baz" >> prop "value" >>= shouldEqual "New text"
 
 -- Test Component
