@@ -1,13 +1,74 @@
--- | Provides a monadic API for Enzyme with counterparts to each of the
--- | `Test.Enzyme` functions. All of these functons have an implicit
--- | `ElementWrapper` argument. E.g. `Enzyme.find ".t--my-selector" wrapper`
--- | becomes `EnzymeM.find ".t--my-selector"`. This also provides some test
--- | bootstrapping helpers (`testComponent` / `testElement`) which accept a
--- | computation in the `EnzymeM` monad and run it as a test.
+-- | Bindings for the [Enzyme library](https://enzymejs.github.io/enzyme/) to
+-- | use with the [Elmish
+-- | library](https://github.com/collegevine/purescript-elmish).
+-- |
+-- | The API here is presented in monadic style, with the idea that there is
+-- | always a "current" DOM element (or, more precisely, current
+-- | `ElementWrapper`, whcih may refer to zero or more actual DOM elements),
+-- | with respect to which all operations run. A test starts with either
+-- | `testComponent` or `testElement`, and it's that component (or element) that
+-- | becomes the "current" element at the start, for example:
+-- |
+-- |```purs
+-- |-- The main module:
+-- |myComponent :: ComponentDef Message State
+-- |myComponent = { init, view, update } where ...
+-- |
+-- |-- The test module:
+-- |import Elmish.Enzyme (testComponent, text)
+-- |
+-- |someTest = it "contains the right text" do
+-- |  testComponent myComponent do
+-- |    content <- text
+-- |    content `shouldContain` "right"
+-- |```
+-- |
+-- | From there, it's possible to "drill down" into a particular element, making
+-- | it "current" temporarily, via `withSelector` or `withElement` (similar to
+-- | Capybara's `within`), for example:
+-- |
+-- |```purs
+-- |import Elmish.Enzyme (testComponent, text, withSelector)
+-- |
+-- |someTest = it "has two buttons with the right text" do
+-- |  testComponent myComponent do
+-- |    withSelector "button.first-button" do
+-- |      content <- text
+-- |      content `shouldEqual` "I'm the first button!"
+-- |
+-- |    withSelector "button.second-button" do
+-- |      content <- text
+-- |      content `shouldEqual` "I'm the second button!"
+-- |```
+-- |
+-- | Alternatively, operations that return an `ElementWrapper` may be combined
+-- | in a chain using the `>>` operator (which is just a convenient facade for
+-- | `withElement` under the hood):
+-- |
+-- |```purs
+-- |import Elmish.Enzyme (testComponent, text, find, at, (>>))
+-- |
+-- |someTest = it "has two buttons with the right text" do
+-- |  testComponent myComponent do
+-- |    -- A short chain, just two functions:
+-- |    b1 <- find "button.first-button" >> text
+-- |    b1 `shouldEqual` "I'm the first button!"
+-- |
+-- |    -- A longer chain: `find`, then `at`, then `text`
+-- |    b2 <- find "button" >> at 1 >> text
+-- |    b2 `shouldEqual` "I'm the second button!"
+-- |
+-- |    -- An even longer chain:
+-- |    b3 <- find ".card" >> at 3 >> find "button" >> at 1 >> text
+-- |    b3 `shouldEqual` "I'm second button in 4th card!"
+-- |```
+-- |
+-- | The end result is an API that somewhat resembles how Emzyme would be used
+-- | from JavaScript, as well as other similar testing libraries, sych as
+-- | Capybara.
 module Elmish.Enzyme
   ( EnzymeM
-  , testComponent
-  , testElement
+  , testComponent, testElement
   , at
   , clickOn
   , count
@@ -21,19 +82,16 @@ module Elmish.Enzyme
   , name
   , parent
   , prop
-  , setState
-  , simulate
-  , simulate'
-  , simulateCustom'
+  , simulate, simulate', simulateCustom'
   , state
   , text
   , toArray
   , trace
+  , unsafeSetState
   , update
-  , waitUntil
-  , waitWhile
-  , withElement
-  , withElementM
+  , waitUntil, waitUntil'
+  , waitWhile, waitWhile'
+  , withElement, withElementM
   , withSelector
   , (>>)
   , module ForeignExports
@@ -54,17 +112,18 @@ import Elmish.Component (ComponentDef)
 import Foreign (Foreign)
 import Elmish.Enzyme.Foreign (ElementWrapper)
 import Elmish.Enzyme.Foreign as E
-import Elmish.Enzyme.Foreign (configure) as ForeignExports
+import Elmish.Enzyme.Foreign (ElementWrapper, configure) as ForeignExports
 
--- | Monad in which an `ElementWrapper` is implicit in function calls
+-- | Monad for running Enzyme tests. Keeps a reference to the "current" DOM
+-- | element(s).
 type EnzymeM = ReaderT ElementWrapper Aff
 
 -- | Runs a test with a `ComponentDef` as the implicit `ElementWrapper`
 -- |
 -- | ```purescript
 -- | it "displays content" do
--- |   EnzymeM.testComponent (MyComponent.def props) do
--- |     EnzymeM.exists ".t--my-content" >>= shouldEqual true
+-- |   testComponent (MyComponent.def props) do
+-- |     exists ".t--my-content" >>= shouldEqual true
 -- | ```
 testComponent :: forall m msg state. MonadAff m => ComponentDef msg state -> EnzymeM Unit -> m Unit
 testComponent component test = liftAff do
@@ -76,8 +135,8 @@ testComponent component test = liftAff do
 -- |
 -- | ```purescript
 -- | pending' "displays content"
--- |   EnzymeM.testElement (MyElement.render props) do
--- |     EnzymeM.exists ".t--my-content" >>= shouldEqual true
+-- |   testElement (MyElement.render props) do
+-- |     exists ".t--my-content" >>= shouldEqual true
 -- | ```
 testElement :: forall m. MonadAff m => ReactElement -> EnzymeM Unit -> m Unit
 testElement element test = liftAff do
@@ -85,20 +144,24 @@ testElement element test = liftAff do
   runReaderT test wrapper
   E.unmount wrapper
 
--- | The current context can have multiple nodes. This gets the element at the
--- | given index. See
+-- | The current context can contain multiple DOM elements. This gets the
+-- | element at the given index (zero-based). See
 -- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/at.html for more
 -- | info.
+-- |
+-- |```purs
+-- |find "button" >> at 3 >> text >>= shouldEqual "Fourth button"
+-- |```
 at :: Int -> EnzymeM ElementWrapper
 at index = E.at index =<< ask
 
--- | Returns the string representing the DOM tree of the current element. See
+-- | Returns the string representing the DOM tree of the current element(s). See
 -- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/debug.html for more
 -- | info.
 debug :: DebugWarning => EnzymeM String
 debug = E.debug =<< ask
 
--- | Logs a string representing the DOM tree of the current element.
+-- | Logs a string representing the DOM tree of the current element(s).
 trace :: DebugWarning => EnzymeM Unit
 trace = log =<< debug
 
@@ -122,8 +185,8 @@ parent :: EnzymeM ElementWrapper
 parent = E.parent =<< ask
 
 -- | Finds a single element with the given selector within the current element
--- | (see also `find`). Crashes if no elements or more than one elements could
--- | be found.
+-- | (see also `find`). Crashes if no elements or more than one element was
+-- | found.
 findSingle :: String -> EnzymeM ElementWrapper
 findSingle selector = do
   e <- find selector
@@ -144,45 +207,52 @@ is selector = E.is selector =<< ask
 prop :: forall a. String -> EnzymeM a
 prop key = E.prop key =<< ask
 
--- | Sets the state of the given `ElementWrapper`. This is asynchronous, so runs
--- | in a `MonadAff`.
+-- | Sets the state of the current element. Note that this is
 -- | See https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/setState.html
 -- | for more info.
-setState :: forall state. state -> EnzymeM Unit
-setState newState =
-  E.setState newState =<< ask
+-- |
+-- | NOTE: this is a type-unsafe operation. There is no check to make sure the
+-- | state being set here has the type of the actual state the component in
+-- | question is using.
+unsafeSetState :: forall state. state -> EnzymeM Unit
+unsafeSetState newState =
+  E.unsafeSetState newState =<< ask
 
 -- | A convenience function for calling `simulate'` without an `event` arg.
 simulate :: String -> EnzymeM Unit
 simulate eventType =
   E.simulate eventType =<< ask
 
--- | Simulates a certain event type on the current element. The event
--- | argument is passed to the component’s event handler.
--- |
+-- | Simulates a certain event type on the current element. The event argument
+-- | is a record that gets merged with a simulated React synthetic event before
+-- | being passed to the component’s event handler. See
+-- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/simulate.html for
+-- | more info.
+
 -- | NOTE: This doesn’t actually emit an event, but just triggers the event
 -- | handler on the wrapper.
 -- |
 -- | NOTE 2: This function only works for native HTML elements. For emitting
 -- | events on custom React components, use `simulateCustom`.
--- |
--- | See https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/simulate.html
--- | for more info.
-simulate' :: forall a. String -> a -> EnzymeM Unit
+simulate' :: forall r. String -> Record r -> EnzymeM Unit
 simulate' eventType event =
   E.simulate' eventType event =<< ask
 
 -- | Simulates an event on a custom React component (i.e. not an HTML element).
 -- | For reasons to complicated to discuss here, the regular `simulate` doesn't
 -- | work on custom components, so we provide this workaround.
+-- |
+-- | NOTE: the second parameter is passed to the event handler without any
+-- | checks whatsoever. This is, of course, not type-safe, but it is in line
+-- | with what the event handler should expect anyway: after all, the underlying
+-- | JavaScript component may pass anything at all as event argument.
 simulateCustom' :: forall a. String -> a -> EnzymeM Unit
 simulateCustom' eventType event =
   E.simulateCustom' eventType event =<< ask
 
--- | A convienience shorthand for clicking an element known by CSS selector.
--- | Just a wrapper around `withSelector` and `simulate "click"`.
+-- | A convienience shorthand for clicking an element known by CSS selector
 clickOn :: String -> EnzymeM Unit
-clickOn selector = withSelector selector $ simulate "click"
+clickOn selector = find selector >> simulate "click"
 
 -- | Returns the state of the current element. See
 -- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/state.html for more
@@ -211,38 +281,33 @@ count selector = E.count selector =<< ask
 -- | re-render. For some reason, Enzyme won't pick up the changes automatically.
 -- | See https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/update.html for
 -- | more info.
+-- |
+-- | NOTE: this only works on the "root" element, which means it cannot be
+-- | called inside `withSelector` or `withElement`.
 update :: EnzymeM Unit
-update =
-  E.update =<< ask
+update = E.update =<< ask
 
 -- | Takes an `ElementWrapper` and runs an `EnzymeM` computation with the given
 -- | wrapper as the new implicit wrapper. This can be thought of as analogous to
 -- | Capybara’s `within`.
 -- |
 -- | ```purescript
--- | EnzymeM.withElement button do
--- |   EnzymeM.simulate "click"
--- |   EnzymeM.prop "disabled" >>= shouldEqual true
+-- | button <- find "button.my-button"
+-- | withElement button do
+-- |   simulate "click"
+-- |   prop "disabled" >>= shouldEqual true
 -- | ```
 withElement :: forall a. ElementWrapper -> EnzymeM a -> EnzymeM a
 withElement wrapper =
   withReaderT $ const wrapper
 
--- | Monadic version of `withElement` which allows chaining `EnzymeM` functions.
--- | The intent is to make it so that there’s no need to reach into `Enzyme`, so
--- | that developers don’t need to remember when to use `EnzymeM` vs. `Enzyme`.
--- |
--- | Meant to be used with the infix operator (`>>`):
--- |
--- | ```purescript
--- | EM.find ".foo" >> EM.at 1 >> EM.find ".bar" >> EM.simulate "click"
--- | ```
--- |
--- | instead of having to use `Enzyme` functions also (note the `E.*`s instead
--- | of `EM.*`).
+-- | A version of `withElement` that takes the `ElementWrapper` wrapped in
+-- | `EnzymeM` rather than "naked". Aliased as the `>>` operator, this allows
+-- | for handy chaining of operations that return an `ElementWrapper`, for
+-- | example:
 -- |
 -- | ```purescript
--- | EM.find ".foo" >>= E.at 1 >>= E.find ".bar" >>= E.simulate "click"
+-- | find ".foo" >> at 1 >> find ".bar" >> simulate "click"
 -- | ```
 withElementM :: forall a. EnzymeM ElementWrapper -> EnzymeM a -> EnzymeM a
 withElementM el f = el >>= \e -> withElement e f
@@ -284,9 +349,9 @@ forEach f = E.forEach (\e -> withElement e f) =<< ask
 -- | passes it to `withElement`.
 -- |
 -- | ```purescript
--- | EnzymeM.withSelector ".t--my-button" do
--- |   EnzymeM.simulate "click"
--- |   EnzymeM.prop "disabled" >>= shouldEqual true
+-- | withSelector ".t--my-button" do
+-- |   simulate "click"
+-- |   prop "disabled" >>= shouldEqual true
 -- | ```
 withSelector :: forall a. String -> EnzymeM a -> EnzymeM a
 withSelector selector m = do
@@ -296,12 +361,22 @@ withSelector selector m = do
 -- | Performs active wait while the given condition is true. Times out with a
 -- | crash after a second.
 waitWhile :: EnzymeM Boolean -> EnzymeM Unit
-waitWhile f = waitUntil $ not <$> f
+waitWhile = waitWhile' (Milliseconds 1000.0)
 
 -- | Performs active wait while the given condition is false. Times out with a
 -- | crash after a second.
 waitUntil :: EnzymeM Boolean -> EnzymeM Unit
-waitUntil f = go 1000.0
+waitUntil = waitUntil' (Milliseconds 1000.0)
+
+-- | Performs active wait while the given condition is true. Times out with a
+-- | crash after given time period.
+waitWhile' :: Milliseconds -> EnzymeM Boolean -> EnzymeM Unit
+waitWhile' timeout f = waitUntil' timeout $ not <$> f
+
+-- | Performs active wait while the given condition is true. Times out with a
+-- | crash after given time period.
+waitUntil' :: Milliseconds -> EnzymeM Boolean -> EnzymeM Unit
+waitUntil' (Milliseconds timeout) f = go timeout
   where
     go remaining = do
       when (remaining <= 0.0) $
