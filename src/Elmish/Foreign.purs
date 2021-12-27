@@ -1,6 +1,7 @@
--- | Provides an API for using [Enzyme](https://enzymejs.github.io/enzyme/).
--- | This is a pretty thin wrapper around Enzyme with a few convenience
--- | functions added.
+-- | Provides an FFI bindings for the
+-- | [Enzyme](https://enzymejs.github.io/enzyme/) library. This is a pretty thin
+-- | wrapper around Enzyme with a few convenience functions added. For a
+-- | convenient API, use `Elmish.Enzyme` instead.
 module Elmish.Enzyme.Foreign
   ( ElementWrapper
   , configure
@@ -19,7 +20,6 @@ module Elmish.Enzyme.Foreign
   , name
   , parent
   , prop
-  , setState
   , simulate
   , simulate'
   , simulateCustom'
@@ -27,6 +27,7 @@ module Elmish.Enzyme.Foreign
   , text
   , toArray
   , unmount
+  , unsafeSetState
   , update
   ) where
 
@@ -34,7 +35,6 @@ import Prelude
 
 import Data.Array ((..))
 import Data.Function.Uncurried (Fn2, runFn2)
-import Data.Nullable as Nullable
 import Data.Traversable (for, for_)
 import Effect (Effect)
 import Effect.Aff (Milliseconds(..), delay)
@@ -145,36 +145,45 @@ prop :: forall a m. MonadEffect m => String -> ElementWrapper -> m a
 prop selector w = liftEffect $ runEffectFn2 prop_ selector w
 
 -- | Sets the state of the given `ElementWrapper`. This is asynchronous, so runs
--- | in a `MonadAff`.
--- | See https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/setState.html
--- | for more info.
-setState :: forall state m. MonadAff m => state -> ElementWrapper -> m Unit
-setState newState =
-  liftAff <<< fromEffectFnAff <<< runFn2 setState_ newState
+-- | in a `MonadAff`. See
+-- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/setState.html for
+-- | more info.
+-- |
+-- | NOTE: this is a type-unsafe operation. There is no check to make sure the
+-- | state being set here has the type of the actual state the component in
+-- | question is using.
+unsafeSetState :: forall state m. MonadAff m => state -> ElementWrapper -> m Unit
+unsafeSetState newState =
+  liftAff <<< fromEffectFnAff <<< runFn2 unsafeSetState_ newState
 
 -- | A convenience function for calling `simulate'` without an `event` arg.
 simulate :: forall m. MonadEffect m => String -> ElementWrapper -> m Unit
 simulate eventType =
-  simulate' eventType Nullable.null
+  simulate' eventType {}
 
--- | Simulates a certain event type on a given `ElementWrapper`. The event
--- | argument is passed to the component’s event handler.
--- |
+-- | Simulates a certain event type on a given `ElementWrapper`. The event argument
+-- | is a record that gets merged with a simulated React synthetic event before
+-- | being passed to the component’s event handler. See
+-- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/simulate.html for
+-- | more info.
+
 -- | NOTE: This doesn’t actually emit an event, but just triggers the event
 -- | handler on the wrapper.
 -- |
 -- | NOTE 2: This function only works for native HTML elements. For emitting
 -- | events on custom React components, use `simulateCustom`.
--- |
--- | See https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/simulate.html
--- | for more info.
-simulate' :: forall m a. MonadEffect m => String -> a -> ElementWrapper -> m Unit
+simulate' :: forall m r. MonadEffect m => String -> Record r -> ElementWrapper -> m Unit
 simulate' eventType event =
   liftEffect <<< runEffectFn3 simulate_ eventType (unsafeToForeign event)
 
 -- | Simulates an event on a custom React component (i.e. not an HTML element).
 -- | For reasons to complicated to discuss here, the regular `simulate` doesn't
 -- | work on custom components, so we provide this workaround.
+-- |
+-- | NOTE: the second parameter is passed to the event handler without any
+-- | checks whatsoever. This is, of course, not type-safe, but it is in line
+-- | with what the event handler should expect anyway: after all, the underlying
+-- | JavaScript component may pass anything at all as event argument.
 simulateCustom' :: forall m a. MonadEffect m => String -> a -> ElementWrapper -> m Unit
 simulateCustom' eventType event =
   liftEffect <<< runEffectFn3 simulateCustom_ eventType (unsafeToForeign event)
@@ -238,7 +247,7 @@ foreign import is_ :: EffectFn2 String ElementWrapper Boolean
 
 foreign import prop_ :: forall a. EffectFn2 String ElementWrapper a
 
-foreign import setState_ :: forall state. Fn2 state ElementWrapper (EffectFnAff Unit)
+foreign import unsafeSetState_ :: forall state. Fn2 state ElementWrapper (EffectFnAff Unit)
 
 foreign import simulate_ :: EffectFn3 String Foreign ElementWrapper Unit
 

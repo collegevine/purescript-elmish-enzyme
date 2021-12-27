@@ -25,7 +25,7 @@ exports.length = wrapper => wrapper.length
 
 exports.prop_ = (key, wrapper) => wrapper.prop(key)
 
-exports.setState_ = (newState, wrapper) => {
+exports.unsafeSetState_ = (newState, wrapper) => {
   return (_onError, onSuccess) => {
     wrapper.setState(newState, onSuccess)
 
