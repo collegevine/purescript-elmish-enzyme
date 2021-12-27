@@ -8,6 +8,7 @@ import Elmish ((<?|))
 import Elmish.Component (ComponentDef)
 import Elmish.Enzyme (clickOn, exists, find, prop, simulate', testComponent, testElement, text, (>>))
 import Elmish.Enzyme as Enzyme
+import Elmish.Enzyme.Adapter as Adapter
 import Elmish.Foreign (readForeign)
 import Elmish.HTML.Styled as H
 import Test.Spec (Spec, describe, it)
@@ -19,7 +20,7 @@ foreign import _configureJsDomViaFfi :: Type
 
 main :: Effect Unit
 main = do
-  Enzyme.configure
+  Enzyme.configure Adapter.unofficialReact_17
   launchAff_ $ runSpec [specReporter] spec
 
 spec :: Spec Unit

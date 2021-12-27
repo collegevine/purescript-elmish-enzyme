@@ -1,8 +1,7 @@
 const Enzyme = require('enzyme')
-const Adapter = require('@wojtekmaj/enzyme-adapter-react-17')
 
-exports.configure_ = () => {
-  Enzyme.configure({ adapter: new Adapter() })
+exports.configure_ = (adapter) => {
+  Enzyme.configure({ adapter })
 }
 
 exports.mount_ = Enzyme.mount

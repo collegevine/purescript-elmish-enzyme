@@ -23,11 +23,11 @@
   },
   "homepage": "https://github.com/collegevine/purescript-elmish-enzyme#readme",
   "devDependencies": {
+    "@wojtekmaj/enzyme-adapter-react-17": "^0.6.6",
     "purescript": "^0.14.5",
     "spago": "^0.20.3"
   },
   "dependencies": {
-    "@wojtekmaj/enzyme-adapter-react-17": "^0.6.5",
     "enzyme": "^3.11.0",
     "global-jsdom": "^8.4.0",
     "jsdom": "^16.5.1",
