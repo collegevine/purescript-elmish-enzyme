@@ -49,8 +49,7 @@ import Foreign (Foreign, unsafeToForeign)
 
 -- | Configures the correct Enzyme adapter. Called once in the main spec.
 configure :: Adapter -> Effect Unit
-configure =
-  runEffectFn1 configure_
+configure = runEffectFn1 configure_
 
 -- | Fully mounts a `ReactElement` and returns an `ElementWrapper`.
 -- | See https://enzymejs.github.io/enzyme/docs/api/shallow.html for more info.
