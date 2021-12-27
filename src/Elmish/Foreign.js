@@ -1,7 +1,7 @@
 const Enzyme = require('enzyme')
 
 exports.configure_ = (adapter) => {
-  Enzyme.configure({ adapter })
+  Enzyme.configure({ adapter: adapter() })
 }
 
 exports.mount_ = Enzyme.mount
