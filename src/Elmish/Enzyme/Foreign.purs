@@ -44,12 +44,12 @@ import Effect.Class (class MonadEffect, liftEffect)
 import Effect.Uncurried (EffectFn1, runEffectFn1)
 import Elmish (ComponentDef, ReactElement, construct)
 import Elmish.Component (ComponentName(..), wrapWithLocalState)
+import Elmish.Enzyme.Adapter (Adapter)
 import Foreign (Foreign, unsafeToForeign)
 
 -- | Configures the correct Enzyme adapter. Called once in the main spec.
-configure :: Effect Unit
-configure =
-  runEffectFn1 configure_ unit
+configure :: Adapter -> Effect Unit
+configure = runEffectFn1 configure_
 
 -- | Fully mounts a `ReactElement` and returns an `ElementWrapper`.
 -- | See https://enzymejs.github.io/enzyme/docs/api/shallow.html for more info.
@@ -227,7 +227,7 @@ unmount =
 update :: forall m. MonadEffect m => ElementWrapper -> m Unit
 update = liftEffect <<< runEffectFn1 update_
 
-foreign import configure_ :: EffectFn1 Unit Unit
+foreign import configure_ :: EffectFn1 Adapter Unit
 
 foreign import mount_ :: EffectFn1 ReactElement ElementWrapper
 
