@@ -13,7 +13,7 @@ someTest = it "has two buttons with the right text" do
 
 ## Getting Started
 
-To start using this library, you’ll need to install Enzyme, and [JSDOM](https://github.com/jsdom/jsdom).
+To start using this library, you’ll need to install Enzyme and [JSDOM](https://github.com/jsdom/jsdom).
 
 ```
 npm install enzyme jsdom global-jsdom --save-dev
