@@ -5,10 +5,11 @@
 ```purs
 import Elmish.Enzyme (testComponent, text, find, at, simulate, (>>))
 
-someTest = it "has two buttons with the right text" do
-  testComponent myComponent do
-    find ".card" >> at 3 >> find "button" >> simulate "click"
-    find ".modal" >> text >>= shouldEqual "Modal content"
+someTest = describe "card button" do
+  it "opens modal on click" do
+    testComponent myComponent do
+      find ".card" >> at 3 >> find "button" >> simulate "click"
+      find ".modal" >> text >>= shouldEqual "Modal content"
 ```
 
 ## Getting Started
@@ -53,17 +54,17 @@ main = do
 
 This library supports the following adapters:
 
-| Adapter Name (in Adapter.purs) | Enzyme Adapter Package | React SemVer Compatibility |
-| --- | --- | --- |
-| `unofficialReact_17` | `@wojtekmaj/enzyme-adapter-react-17` | `^17.0.0` |
-| `react_16_4` | `enzyme-adapter-react-16` | `^16.4.0-0` |
-| `react_16_3` | `enzyme-adapter-react-16.3` | `~16.3.0-0` |
-| `react_16_2` | `enzyme-adapter-react-16.2` | `~16.2` |
-| `react_16_1` | `enzyme-adapter-react-16.1` | <code>~16.0.0-0 &#124;&#124; ~16.1</code> |
-| `react_15_5` | `enzyme-adapter-react-15` | `^15.5.0` |
-| `react_15_4` | `enzyme-adapter-react-15.4` | `15.0.0-0 - 15.4.x` |
-| `react_14` | `enzyme-adapter-react-14` | `^0.14.0` |
-| `react_13` | `enzyme-adapter-react-13` | `^0.13.0` |
+| Adapter Name (in Adapter.purs) | Enzyme Adapter Package               | React SemVer Compatibility                |
+|--------------------------------|--------------------------------------|-------------------------------------------|
+| `unofficialReact_17`           | `@wojtekmaj/enzyme-adapter-react-17` | `^17.0.0`                                 |
+| `react_16_4`                   | `enzyme-adapter-react-16`            | `^16.4.0-0`                               |
+| `react_16_3`                   | `enzyme-adapter-react-16.3`          | `~16.3.0-0`                               |
+| `react_16_2`                   | `enzyme-adapter-react-16.2`          | `~16.2`                                   |
+| `react_16_1`                   | `enzyme-adapter-react-16.1`          | <code>~16.0.0-0 &#124;&#124; ~16.1</code> |
+| `react_15_5`                   | `enzyme-adapter-react-15`            | `^15.5.0`                                 |
+| `react_15_4`                   | `enzyme-adapter-react-15.4`          | `15.0.0-0 - 15.4.x`                       |
+| `react_14`                     | `enzyme-adapter-react-14`            | `^0.14.0`                                 |
+| `react_13`                     | `enzyme-adapter-react-13`            | `^0.13.0`                                 |
 
 ## Examples
 
