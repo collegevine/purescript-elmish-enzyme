@@ -4,7 +4,7 @@
 -- |
 -- | The API here is presented in monadic style, with the idea that there is
 -- | always a "current" DOM element (or, more precisely, current
--- | `ElementWrapper`, whcih may refer to zero or more actual DOM elements),
+-- | `ElementWrapper`, which may refer to zero or more actual DOM elements),
 -- | with respect to which all operations run. A test starts with either
 -- | `testComponent` or `testElement`, and it's that component (or element) that
 -- | becomes the "current" element at the start, for example:
