@@ -346,7 +346,7 @@ toArray = E.toArray =<< ask
 forEach :: EnzymeM Unit -> EnzymeM Unit
 forEach f = E.forEach (\e -> withElement e f) =<< ask
 
--- | Returns number of elements in a given wrapper
+-- | Returns number of elements in the current context
 length :: EnzymeM Int
 length = E.length <$> ask
 
