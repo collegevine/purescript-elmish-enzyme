@@ -78,6 +78,7 @@ module Elmish.Enzyme
   , findSingle
   , forEach
   , is
+  , length
   , mapEach
   , name
   , parent
@@ -344,6 +345,10 @@ toArray = E.toArray =<< ask
 -- |
 forEach :: EnzymeM Unit -> EnzymeM Unit
 forEach f = E.forEach (\e -> withElement e f) =<< ask
+
+-- | Returns number of elements in the current context
+length :: EnzymeM Int
+length = E.length <$> ask
 
 -- | A convenience function which finds an element for the given selector and
 -- | passes it to `withElement`.
