@@ -1,0 +1,31 @@
+{
+    "name": "purescript-elmish-enzyme",
+    "license": [
+        "MIT"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/collegevine/purescript-elmish-enzyme.git"
+    },
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "output"
+    ],
+    "dependencies": {
+        "purescript-aff": "^v6.0.0",
+        "purescript-arrays": "^v6.0.1",
+        "purescript-console": "^v5.0.0",
+        "purescript-debug": "^v5.0.0",
+        "purescript-effect": "^v3.0.0",
+        "purescript-elmish": "^v0.5.6",
+        "purescript-exceptions": "^v5.0.0",
+        "purescript-foldable-traversable": "^v5.0.1",
+        "purescript-foreign": "^v6.0.1",
+        "purescript-functions": "^v5.0.0",
+        "purescript-prelude": "^v5.0.1",
+        "purescript-psci-support": "^v5.0.0",
+        "purescript-transformers": "^v5.2.0"
+    }
+}
