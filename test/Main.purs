@@ -32,7 +32,7 @@ spec = do
 
   describe "find" $
     it "gets an element wrapper by a selector" $
-      testComponent def do
+      testComponent def $
         find ".bar" >> text >>= shouldEqual "Bar"
 
   describe "exists" do
