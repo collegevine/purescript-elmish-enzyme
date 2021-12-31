@@ -206,7 +206,7 @@ instance Find SingleNode where
 -- | some of the elements have the same parent. See
 -- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/find.html for more
 -- | info.
-parent :: EnzymeM ManyNodes (Wrapper ManyNodes)
+parent :: forall n. EnzymeM n (Wrapper n)
 parent = E.parent =<< ask
 
 -- | Returns a `Boolean` indicating whether the current element matches
