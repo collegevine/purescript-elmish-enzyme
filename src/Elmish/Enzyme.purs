@@ -288,7 +288,7 @@ name :: EnzymeM SingleNode String
 name = E.name =<< ask
 
 -- | Returns the number of times a given selector appears.
-count :: String -> EnzymeM ManyNodes Int
+count :: forall n. String -> EnzymeM n Int
 count selector = E.count selector =<< ask
 
 -- | Updates the current element to reflect the latest state. Call this function
