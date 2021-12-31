@@ -57,7 +57,7 @@ data Wrapper (w :: NodeMultiplicity)
 configure :: Adapter -> Effect Unit
 configure = runEffectFn1 configure_
 
--- | Fully mounts a `ReactElement` and returns an `Wrapper`.
+-- | Fully mounts a `ReactElement` and returns a `Wrapper`.
 -- | See https://enzymejs.github.io/enzyme/docs/api/shallow.html for more info.
 mount :: forall m. MonadEffect m => ReactElement -> m (Wrapper SingleNode)
 mount =
@@ -92,7 +92,7 @@ shallowComponent def = do
   liftAff $ delay (Milliseconds 0.0)
   pure wrapper
 
--- | An `Wrapper` can have multiple nodes. This gets the node at the
+-- | A `Wrapper` can have multiple nodes. This gets the node at the
 -- | given index.
 -- | See https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/at.html for
 -- | more info.
@@ -144,7 +144,7 @@ is selector w = liftEffect $ runEffectFn2 is_ selector w
 -- | Returns number of elements in a given wrapper
 foreign import length :: Wrapper ManyNodes -> Int
 
--- | Returns the value of an `Wrapper`’s prop with a certain key.
+-- | Returns the value of a `Wrapper`’s prop with a certain key.
 -- | See https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/prop.html
 -- | for more info.
 prop :: forall a m. MonadEffect m => String -> Wrapper SingleNode -> m a
