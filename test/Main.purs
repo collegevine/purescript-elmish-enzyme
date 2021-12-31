@@ -7,7 +7,7 @@ import Effect (Effect)
 import Effect.Aff (launchAff_, message, try)
 import Elmish ((<?|))
 import Elmish.Component (ComponentDef)
-import Elmish.Enzyme (at, clickOn, exists, find, findSingle, length, prop, simulate', testComponent, testElement, text, (>>))
+import Elmish.Enzyme (at, clickOn, exists, findAll, find, length, prop, simulate', testComponent, testElement, text, (>>))
 import Elmish.Enzyme as Enzyme
 import Elmish.Enzyme.Adapter as Adapter
 import Elmish.Foreign (readForeign)
@@ -31,26 +31,26 @@ spec = do
       testElement (H.div "" "Foo") $
         text >>= shouldEqual "Foo"
 
-  describe "findSingle" do
+  describe "find" do
     it "gets an element wrapper by a selector" $
       testComponent def $
-        findSingle ".bar" >> text >>= shouldEqual "Bar"
+        find ".bar" >> text >>= shouldEqual "Bar"
     it "crashes when multiple elements are found" $
       testComponent def $
-        try (findSingle ".qux p") >>= case _ of
+        try (find ".qux p") >>= case _ of
           Left err -> message err `shouldEqual` "Expected a single element matching '.qux p', but found 2"
-          Right _ -> fail "Expected findSingle to crash"
+          Right _ -> fail "Expected find to crash"
     it "crashes when zero elements are found" $
       testComponent def $
-        try (findSingle ".qux a") >>= case _ of
+        try (find ".qux a") >>= case _ of
           Left err -> message err `shouldEqual` "Expected a single element matching '.qux a', but found 0"
-          Right _ -> fail "Expected findSingle to crash"
+          Right _ -> fail "Expected find to crash"
 
-  describe "find" $
+  describe "findAll" $
     it "gets multiple elements" $
       testComponent def do
-        find ".qux" >> find "p" >> length >>= shouldEqual 2
-        find ".qux" >> find "p" >> at 0 >> text >>= shouldEqual "First"
+        findAll ".qux" >> findAll "p" >> length >>= shouldEqual 2
+        findAll ".qux" >> findAll "p" >> at 0 >> text >>= shouldEqual "First"
 
   describe "exists" do
     it "returns `true` when selector is found" $
@@ -64,7 +64,7 @@ spec = do
   describe "clickOn" $
     it "simulates a click event on a given selector" $
       testComponent def do
-        findSingle ".bar" >> text >>= shouldEqual "Bar"
+        find ".bar" >> text >>= shouldEqual "Bar"
         clickOn ".toggle-bar"
         exists ".bar" >>= shouldEqual false
 
@@ -76,10 +76,10 @@ spec = do
   describe "simulate'" $
     it "simulates a given event with the given argument on the current wrapper" $
       testComponent def do
-        findSingle ".baz" >> do
+        find ".baz" >> do
           prop "value" >>= shouldEqual ""
           simulate' "change" { target: { value: "New text" } }
-        findSingle ".baz" >> prop "value" >>= shouldEqual "New text"
+        find ".baz" >> prop "value" >>= shouldEqual "New text"
 
 -- Test Component
 

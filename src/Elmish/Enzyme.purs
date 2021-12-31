@@ -46,7 +46,7 @@
 -- | `withElement` under the hood):
 -- |
 -- |```purs
--- |import Elmish.Enzyme (testComponent, text, find, at, (>>))
+-- |import Elmish.Enzyme (testComponent, text, find, findAll, at, (>>))
 -- |
 -- |someTest = it "has two buttons with the right text" do
 -- |  testComponent myComponent do
@@ -54,12 +54,12 @@
 -- |    b1 <- find "button.first-button" >> text
 -- |    b1 `shouldEqual` "I'm the first button!"
 -- |
--- |    -- A longer chain: `find`, then `at`, then `text`
--- |    b2 <- find "button" >> at 1 >> text
+-- |    -- A longer chain: `findAll`, then `at`, then `text`
+-- |    b2 <- findAll "button" >> at 1 >> text
 -- |    b2 `shouldEqual` "I'm the second button!"
 -- |
 -- |    -- An even longer chain:
--- |    b3 <- find ".card" >> at 3 >> find "button" >> at 1 >> text
+-- |    b3 <- findAll ".card" >> at 3 >> findAll "button" >> at 1 >> text
 -- |    b3 `shouldEqual` "I'm second button in 4th card!"
 -- |```
 -- |
@@ -75,7 +75,7 @@ module Elmish.Enzyme
   , debug
   , exists
   , find
-  , findSingle
+  , findAll
   , forEach
   , is
   , length
@@ -150,7 +150,7 @@ testElement element test = liftAff do
 -- | info.
 -- |
 -- |```purs
--- |find "button" >> at 3 >> text >>= shouldEqual "Fourth button"
+-- |findAll "button" >> at 3 >> text >>= shouldEqual "Fourth button"
 -- |```
 at :: Int -> EnzymeM ManyNodes (Wrapper SingleNode)
 at index = E.at index =<< ask
@@ -177,8 +177,8 @@ exists selector = E.exists selector =<< ask
 -- |
 -- | See https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/find.html for
 -- | more info.
-find :: forall n. String -> EnzymeM n (Wrapper ManyNodes)
-find selector = E.find selector =<< ask
+findAll :: forall n. String -> EnzymeM n (Wrapper ManyNodes)
+findAll selector = E.find selector =<< ask
 
 -- | Finds a single element matching the given selector within the current
 -- | context. If zero or multiple elements match the selector, crashes with a
@@ -186,18 +186,18 @@ find selector = E.find selector =<< ask
 -- |
 -- | See https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/find.html for
 -- | more info.
-findSingle :: forall n. String -> EnzymeM n (Wrapper SingleNode)
-findSingle selector = do
-  all <- find selector
-  when (E.length all /= 1) $
+find :: forall n. String -> EnzymeM n (Wrapper SingleNode)
+find selector = do
+  els <- findAll selector
+  when (E.length els /= 1) $
     liftAff $ throwError $ error $
-      "Expected a single element matching '" <> selector <> "', but found " <> show (E.length all)
-  pure $ unsafeCoerce all
+      "Expected a single element matching '" <> selector <> "', but found " <> show (E.length els)
+  pure $ unsafeCoerce els
 
 -- | Returns parent of the current element. When the current context contains
 -- | multiple elements, the result will contain exactly as many parents, even if
 -- | some of the elements have the same parent. See
--- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/find.html for more
+-- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/parent.html for more
 -- | info.
 parent :: forall n. EnzymeM n (Wrapper n)
 parent = E.parent =<< ask
@@ -260,7 +260,7 @@ simulateCustom' eventType event =
 
 -- | A convienience shorthand for clicking an element known by CSS selector
 clickOn :: forall n. String -> EnzymeM n Unit
-clickOn selector = findSingle selector >> simulate "click"
+clickOn selector = find selector >> simulate "click"
 
 -- | Returns the state of the current element. See
 -- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/state.html for more
@@ -315,7 +315,7 @@ withElement wrapper =
 -- | example:
 -- |
 -- | ```purescript
--- | find ".foo" >> at 1 >> find ".bar" >> simulate "click"
+-- | findAll ".foo" >> at 1 >> find ".bar" >> simulate "click"
 -- | ```
 withElementM :: forall a nOuter nInner. EnzymeM nOuter (Wrapper nInner) -> EnzymeM nInner a -> EnzymeM nOuter a
 withElementM el f = el >>= \e -> withElement e f
@@ -328,8 +328,8 @@ infixl 1 withElementM as >>
 -- |
 -- | Example:
 -- |
--- |     allNames <- find ".t--foo" >> mapEach text
--- |     allValues <- find ".t--foo" >> mapEach (prop "value")
+-- |     allNames <- findAll ".t--foo" >> mapEach text
+-- |     allValues <- findAll ".t--foo" >> mapEach (prop "value")
 -- |
 mapEach :: forall a. EnzymeM SingleNode a -> EnzymeM ManyNodes (Array a)
 mapEach f = toArray >>= traverse \e -> withElement e f
@@ -343,9 +343,9 @@ toArray = E.toArray =<< ask
 -- |
 -- | Example:
 -- |
--- |     find "button" >> forEach (simulate "click")
+-- |     findAll "button" >> forEach (simulate "click")
 -- |
--- |     find ".t--foo" >> forEach do
+-- |     findAll ".t--foo" >> forEach do
 -- |       find "input[type=text]" >> simulate' "change" { target: { value: "new text" } }
 -- |       find "input[type=checkbox]" >> simulate "change"
 -- |       find ".t--bar" >> text >>= shouldEqual "qux"
@@ -367,7 +367,7 @@ length = E.length <$> ask
 -- | ```
 withSelector :: forall a n. String -> EnzymeM SingleNode a -> EnzymeM n a
 withSelector selector m = do
-  wrapper <- findSingle selector
+  wrapper <- find selector
   withElement wrapper m
 
 -- | Performs active wait while the given condition is true. Times out with a
