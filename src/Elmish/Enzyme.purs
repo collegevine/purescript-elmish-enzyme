@@ -266,7 +266,7 @@ simulateCustom' eventType event =
   E.simulateCustom' eventType event =<< ask
 
 -- | A convienience shorthand for clicking an element known by CSS selector
-clickOn :: String -> EnzymeM ManyNodes Unit
+clickOn :: forall n. String -> EnzymeM n Unit
 clickOn selector = find selector >> simulate "click"
 
 -- | Returns the state of the current element. See
