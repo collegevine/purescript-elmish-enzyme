@@ -158,18 +158,18 @@ at index = E.at index =<< ask
 -- | Returns the string representing the DOM tree of the current element(s). See
 -- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/debug.html for more
 -- | info.
-debug :: forall ctx. DebugWarning => EnzymeM ctx String
+debug :: forall n. DebugWarning => EnzymeM n String
 debug = E.debug =<< ask
 
 -- | Logs a string representing the DOM tree of the current element(s).
-trace :: forall ctx. DebugWarning => EnzymeM ctx Unit
+trace :: forall n. DebugWarning => EnzymeM n Unit
 trace = log =<< debug
 
 -- | Returns a `Boolean` indicating whether a given selector exists within the
 -- | current element.
 -- | See https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/exists.html
 -- | for more info.
-exists :: forall ctx. String -> EnzymeM ctx Boolean
+exists :: forall n. String -> EnzymeM n Boolean
 exists selector = E.exists selector =<< ask
 
 -- | Finds all elements matching the given selector within the current
