@@ -20,7 +20,7 @@ exports.parent_ = wrapper => wrapper.parent()
 
 exports.is_ = (selector, wrapper) => wrapper.is(selector)
 
-exports.length = wrapper => wrapper.length
+exports.length_ = wrapper => wrapper.length
 
 exports.prop_ = (key, wrapper) => wrapper.prop(key)
 
