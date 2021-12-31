@@ -213,7 +213,7 @@ name :: forall m. MonadEffect m => Wrapper SingleNode -> m String
 name = liftEffect <<< runEffectFn1 name_
 
 -- | Returns the number of times a given selector appears within a wrapper.
-count :: forall m. MonadEffect m => String -> Wrapper ManyNodes -> m Int
+count :: forall m n. MonadEffect m => String -> Wrapper n -> m Int
 count selector wrapper = do
   length <$> find selector wrapper
 
