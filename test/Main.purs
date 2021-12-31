@@ -38,7 +38,7 @@ spec = do
     it "crashes when multiple elements are found" $
       testComponent def $
         try (find ".qux p") >>= case _ of
-          Left err -> message err `shouldEqual` "Expected a single element matching '.qux p', but found 2"
+          Left err -> message err `shouldEqual` "Expected a single element matching '.qux p', but found 3"
           Right _ -> fail "Expected find to crash"
     it "crashes when zero elements are found" $
       testComponent def $
@@ -49,7 +49,8 @@ spec = do
   describe "findAll" $
     it "gets multiple elements" $
       testComponent def do
-        findAll ".qux" >> findAll "p" >> length >>= shouldEqual 2
+        findAll ".qux" >> length >>= shouldEqual 2
+        findAll ".qux" >> findAll "p" >> length >>= shouldEqual 3
         findAll ".qux" >> findAll "p" >> at 0 >> text >>= shouldEqual "First"
 
   describe "exists" do
@@ -103,6 +104,9 @@ def =
       , H.div "qux"
         [ H.p "" "First"
         , H.p "" "Second"
+        ]
+      , H.div "qux"
+        [ H.p "" "Third"
         ]
       , if s.bar then
           H.div "bar" "Bar"
