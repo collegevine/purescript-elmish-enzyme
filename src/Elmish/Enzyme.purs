@@ -74,7 +74,8 @@ module Elmish.Enzyme
   , count
   , debug
   , exists
-  , class Find, find
+  , find
+  , findSingle
   , forEach
   , is
   , length
@@ -102,11 +103,9 @@ import Prelude
 import Control.Monad.Reader (ReaderT, ask, runReaderT, withReaderT)
 import Data.Traversable (traverse)
 import Debug (class DebugWarning)
-import Effect.Aff (Aff, Milliseconds(..), delay)
+import Effect.Aff (Aff, Milliseconds(..), delay, error, throwError)
 import Effect.Aff.Class (class MonadAff, liftAff)
-import Effect.Class (liftEffect)
 import Effect.Class.Console (log)
-import Effect.Exception (throw)
 import Elmish (ReactElement)
 import Elmish.Component (ComponentDef)
 import Elmish.Enzyme.Foreign (ManyNodes, NodeMultiplicity, SingleNode, Wrapper)
@@ -173,33 +172,27 @@ trace = log =<< debug
 exists :: forall ctx. String -> EnzymeM ctx Boolean
 exists selector = E.exists selector =<< ask
 
-class Find (nResult :: NodeMultiplicity) where
-  -- | Finds all elements matching the given selector within the current
-  -- | context. If the surrounding code expects a single element (e.g. calling
-  -- | `text` or `prop`), but multiple (or zero) elements match the given
-  -- | selector, the `find` function will crash with an error message explaining
-  -- | that.
-  -- |
-  -- |```purs
-  -- |num <- find "p" >> count
-  -- |num `shouldEqual` 5   -- There are five <p> elements
-  -- |
-  -- |txt <- find "p" >> text   -- Crash: expected to find one element matching 'p', but found 5
-  -- |```
-  -- |
-  -- | See https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/find.html for
-  -- | more info.
-  find :: forall nOuter. String -> EnzymeM nOuter (Wrapper nResult)
+-- | Finds all elements matching the given selector within the current
+-- | context.
+-- |
+-- | See https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/find.html for
+-- | more info.
+find :: forall n. String -> EnzymeM n (Wrapper ManyNodes)
+find selector = E.find selector =<< ask
 
-instance Find ManyNodes where
-  find selector = E.find selector =<< ask
-
-instance Find SingleNode where
-  find selector = do
-    all <- find selector
-    when (E.length all /= 1) $
-      liftEffect $ throw $ "Expected to find one element matching '" <> selector <> "', but found " <> show (E.length all)
-    pure $ unsafeCoerce all
+-- | Finds a single element matching the given selector within the current
+-- | context. If zero or multiple elements match the selector, crashes with a
+-- | descriptive error message.
+-- |
+-- | See https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/find.html for
+-- | more info.
+findSingle :: forall n. String -> EnzymeM n (Wrapper SingleNode)
+findSingle selector = do
+  all <- find selector
+  when (E.length all /= 1) $
+    liftAff $ throwError $ error $
+      "Expected a single element matching '" <> selector <> "', but found " <> show (E.length all)
+  pure $ unsafeCoerce all
 
 -- | Returns parent of the current element. When the current context contains
 -- | multiple elements, the result will contain exactly as many parents, even if
@@ -267,7 +260,7 @@ simulateCustom' eventType event =
 
 -- | A convienience shorthand for clicking an element known by CSS selector
 clickOn :: forall n. String -> EnzymeM n Unit
-clickOn selector = find selector >> simulate "click"
+clickOn selector = findSingle selector >> simulate "click"
 
 -- | Returns the state of the current element. See
 -- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/state.html for more
@@ -374,7 +367,7 @@ length = E.length <$> ask
 -- | ```
 withSelector :: forall a n. String -> EnzymeM SingleNode a -> EnzymeM n a
 withSelector selector m = do
-  wrapper <- find selector
+  wrapper <- findSingle selector
   withElement wrapper m
 
 -- | Performs active wait while the given condition is true. Times out with a
@@ -399,7 +392,7 @@ waitUntil' (Milliseconds timeout) f = go timeout
   where
     go remaining = do
       when (remaining <= 0.0) $
-        liftEffect $ throw "Timeout expired"
+        liftAff $ throwError $ error "Timeout expired"
       liftAff $ delay $ Milliseconds 1.0
       update
       unlessM f $ go $ remaining - 1.0
