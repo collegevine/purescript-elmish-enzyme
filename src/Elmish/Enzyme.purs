@@ -41,7 +41,7 @@
 -- |      content `shouldEqual` "I'm the second button!"
 -- |```
 -- |
--- | Alternatively, operations that return an `Wrapper` may be combined
+-- | Alternatively, operations that return a `Wrapper` may be combined
 -- | in a chain using the `>>` operator (which is just a convenient facade for
 -- | `withElement` under the hood):
 -- |
@@ -295,7 +295,7 @@ count selector = E.count selector =<< ask
 update :: forall n. EnzymeM n Unit
 update = E.update =<< ask
 
--- | Takes an `Wrapper` and runs an `EnzymeM` computation with the given
+-- | Takes a `Wrapper` and runs an `EnzymeM` computation with the given
 -- | wrapper as the new implicit wrapper. This can be thought of as analogous to
 -- | Capybara’s `within`.
 -- |
@@ -311,7 +311,7 @@ withElement wrapper =
 
 -- | A version of `withElement` that takes the `Wrapper` wrapped in
 -- | `EnzymeM` rather than "naked". Aliased as the `>>` operator, this allows
--- | for handy chaining of operations that return an `Wrapper`, for
+-- | for handy chaining of operations that return a `Wrapper`, for
 -- | example:
 -- |
 -- | ```purescript
