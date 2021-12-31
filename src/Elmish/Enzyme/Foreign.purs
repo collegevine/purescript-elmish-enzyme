@@ -65,7 +65,7 @@ mount =
 
 -- | A convenience function for creating a full wrapper from a `ComponentDef`
 -- | rather than a `ReactElement`. This also adds a `delay (Milliseconds 0.0)`
--- | to allow any `Effect`s in `def.init` to run.
+-- | to allow any effects in `def.init` to run.
 mountComponent :: forall m msg state. MonadAff m => ComponentDef msg state -> m (Wrapper SingleNode)
 mountComponent def = do
   wrapper <- liftEffect $ mount =<< construct def
@@ -84,7 +84,7 @@ shallow =
 
 -- | A convenience function for creating a shallow wrapper from a `ComponentDef`
 -- | rather than a `ReactElement`. This also adds a `delay (Milliseconds 0.0)`
--- | to allow any `Effect`s in `def.init` to run.
+-- | to allow any effects in `def.init` to run.
 shallowComponent :: forall m msg state. MonadAff m => ComponentDef msg state -> m (Wrapper SingleNode)
 shallowComponent def = do
   wrapper <- liftEffect $ shallow $
