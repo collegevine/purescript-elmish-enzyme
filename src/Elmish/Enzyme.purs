@@ -114,6 +114,11 @@ import Elmish.Enzyme.Foreign as E
 import Foreign (Foreign)
 import Unsafe.Coerce (unsafeCoerce)
 
+-- | Monad for running Enzyme tests. Keeps a reference to the "current" DOM
+-- | element(s) and tracks the current element's multiplicity (whether it's a
+-- | single node or multiple) at type level (the `context` parameter), allowing
+-- | to check validity of certain functions at compile-time (e.g. `text` only
+-- | works on a single element).
 type EnzymeM (context :: NodeMultiplicity) = ReaderT (Wrapper context) Aff
 
 -- | Mounts the given component and runs the given action with the mounted
