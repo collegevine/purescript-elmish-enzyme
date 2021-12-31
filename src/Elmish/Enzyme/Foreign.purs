@@ -92,10 +92,10 @@ shallowComponent def = do
   liftAff $ delay (Milliseconds 0.0)
   pure wrapper
 
--- | A `Wrapper` can have multiple nodes. This gets the node at the
--- | given index.
--- | See https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/at.html for
--- | more info.
+-- | A `Wrapper` can wrap multiple DOM nodes. This function returns the node at
+-- | the given index. See
+-- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/at.html for more
+-- | info.
 at :: forall m. MonadEffect m => Int -> Wrapper ManyNodes -> m (Wrapper SingleNode)
 at idx w = liftEffect $ runEffectFn2 at_ idx w
 

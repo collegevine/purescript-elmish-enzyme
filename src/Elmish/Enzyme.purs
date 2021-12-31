@@ -144,8 +144,8 @@ testElement element test = liftAff do
   runReaderT test wrapper
   E.unmount wrapper
 
--- | The current context can contain multiple DOM elements. This gets the
--- | element at the given index (zero-based). See
+-- | The current context can contain multiple DOM elements. This function
+-- | returns the element at the given index (zero-based). See
 -- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/at.html for more
 -- | info.
 -- |
