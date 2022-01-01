@@ -8,8 +8,6 @@ module Elmish.Enzyme.Foreign
   , count
   , mount
   , mountComponent
-  , shallow
-  , shallowComponent
   , at
   , debug
   , exists
@@ -43,7 +41,6 @@ import Effect.Aff.Compat (EffectFn2, EffectFn3, EffectFnAff, fromEffectFnAff, ru
 import Effect.Class (class MonadEffect, liftEffect)
 import Effect.Uncurried (EffectFn1, runEffectFn1)
 import Elmish (ComponentDef, ReactElement, construct)
-import Elmish.Component (ComponentName(..), wrapWithLocalState)
 import Elmish.Enzyme.Adapter (Adapter)
 import Foreign (Foreign, unsafeToForeign)
 
@@ -71,25 +68,6 @@ mountComponent def = do
   wrapper <- liftEffect $ mount =<< construct def
   liftAff $ delay (Milliseconds 0.0)
   update wrapper
-  pure wrapper
-
--- | Creates a “shallow wrapper” around an element, which basically means the
--- | DOM tree is rendered up to the next layer of React components. So all plain
--- | HTML within the given `ReactElement` is rendered, but not HTML within
--- | nested components. This does not cause a headless browser to spin up.
--- | See https://enzymejs.github.io/enzyme/docs/api/shallow.html for more info.
-shallow :: forall m. MonadEffect m => ReactElement -> m (Wrapper SingleNode)
-shallow =
-  liftEffect <<< runEffectFn1 shallow_
-
--- | A convenience function for creating a shallow wrapper from a `ComponentDef`
--- | rather than a `ReactElement`. This also adds a `delay (Milliseconds 0.0)`
--- | to allow any effects in `def.init` to run.
-shallowComponent :: forall m msg state. MonadAff m => ComponentDef msg state -> m (Wrapper SingleNode)
-shallowComponent def = do
-  wrapper <- liftEffect $ shallow $
-    wrapWithLocalState (ComponentName "Shallow Test Component") (const def) {}
-  liftAff $ delay (Milliseconds 0.0)
   pure wrapper
 
 -- | A `Wrapper` can wrap multiple DOM nodes. This function returns the node at
@@ -236,8 +214,6 @@ update = liftEffect <<< runEffectFn1 update_
 foreign import configure_ :: EffectFn1 Adapter Unit
 
 foreign import mount_ :: EffectFn1 ReactElement (Wrapper SingleNode)
-
-foreign import shallow_ :: EffectFn1 ReactElement (Wrapper SingleNode)
 
 foreign import at_ :: EffectFn2 Int (Wrapper ManyNodes) (Wrapper SingleNode)
 
