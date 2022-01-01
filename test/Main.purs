@@ -2,17 +2,18 @@ module Test.Main where
 
 import Prelude
 
+import Data.Either (Either(..))
 import Effect (Effect)
-import Effect.Aff (launchAff_)
+import Effect.Aff (launchAff_, message, try)
 import Elmish ((<?|))
 import Elmish.Component (ComponentDef)
-import Elmish.Enzyme (clickOn, exists, find, prop, simulate', testComponent, testElement, text, (>>))
+import Elmish.Enzyme (at, clickOn, exists, findAll, find, length, prop, simulate', testComponent, testElement, text, (>>))
 import Elmish.Enzyme as Enzyme
 import Elmish.Enzyme.Adapter as Adapter
 import Elmish.Foreign (readForeign)
 import Elmish.HTML.Styled as H
 import Test.Spec (Spec, describe, it)
-import Test.Spec.Assertions (shouldEqual)
+import Test.Spec.Assertions (fail, shouldEqual)
 import Test.Spec.Reporter.Spec (specReporter)
 import Test.Spec.Runner (runSpec)
 
@@ -30,10 +31,27 @@ spec = do
       testElement (H.div "" "Foo") $
         text >>= shouldEqual "Foo"
 
-  describe "find" $
+  describe "find" do
     it "gets an element wrapper by a selector" $
       testComponent def $
         find ".bar" >> text >>= shouldEqual "Bar"
+    it "crashes when multiple elements are found" $
+      testComponent def $
+        try (find ".qux p") >>= case _ of
+          Left err -> message err `shouldEqual` "Expected a single element matching '.qux p', but found 3"
+          Right _ -> fail "Expected find to crash"
+    it "crashes when zero elements are found" $
+      testComponent def $
+        try (find ".qux a") >>= case _ of
+          Left err -> message err `shouldEqual` "Expected a single element matching '.qux a', but found 0"
+          Right _ -> fail "Expected find to crash"
+
+  describe "findAll" $
+    it "gets multiple elements" $
+      testComponent def do
+        findAll ".qux" >> length >>= shouldEqual 2
+        findAll ".qux" >> findAll "p" >> length >>= shouldEqual 3
+        findAll ".qux" >> findAll "p" >> at 0 >> text >>= shouldEqual "First"
 
   describe "exists" do
     it "returns `true` when selector is found" $
@@ -83,6 +101,13 @@ def =
       ChangeBaz baz -> pure s { baz = baz }
   , view: \s dispatch -> H.fragment
       [ H.div "foo" "Foo"
+      , H.div "qux"
+        [ H.p "" "First"
+        , H.p "" "Second"
+        ]
+      , H.div "qux"
+        [ H.p "" "Third"
+        ]
       , if s.bar then
           H.div "bar" "Bar"
         else

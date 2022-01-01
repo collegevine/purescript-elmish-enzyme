@@ -18,13 +18,13 @@ to generate this file without the comments in this block.
   , "debug"
   , "effect"
   , "elmish"
-  , "exceptions"
   , "foldable-traversable"
   , "foreign"
   , "functions"
   , "prelude"
   , "psci-support"
   , "transformers"
+  , "unsafe-coerce"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs" ]

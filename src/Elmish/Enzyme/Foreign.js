@@ -6,8 +6,6 @@ exports.configure_ = (adapter) => {
 
 exports.mount_ = Enzyme.mount
 
-exports.shallow_ = Enzyme.shallow
-
 exports.at_ = (index, wrapper) => wrapper.at(index)
 
 exports.debug_ = (wrapper) => wrapper.debug()
