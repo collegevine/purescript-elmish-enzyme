@@ -3,10 +3,9 @@
 -- | wrapper around Enzyme with a few convenience functions added. For a
 -- | convenient API, use `Elmish.Enzyme` instead.
 module Elmish.Enzyme.Foreign
-  ( ManyNodes
-  , NodeMultiplicity
-  , SingleNode
-  , Wrapper
+  ( Wrapper, NodeMultiplicity, SingleNode, ManyNodes
+  , mount
+  , mountComponent
   , at
   , childAt
   , children
@@ -18,8 +17,6 @@ module Elmish.Enzyme.Foreign
   , forEach
   , is
   , length
-  , mount
-  , mountComponent
   , name
   , parent
   , prop
