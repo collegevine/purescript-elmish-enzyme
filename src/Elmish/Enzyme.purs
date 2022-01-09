@@ -89,6 +89,7 @@ module Elmish.Enzyme
   , simulate
   , simulate'
   , simulateCustom'
+  , spy
   , state
   , testComponent
   , testElement
@@ -177,6 +178,9 @@ debug = E.debug =<< ask
 -- | Logs a string representing the DOM tree of the current element(s).
 trace :: forall n. DebugWarning => EnzymeM n Unit
 trace = log =<< debug
+
+spy :: forall n. DebugWarning => EnzymeM n (Wrapper n)
+spy = ask <* trace
 
 -- | Returns a `Boolean` indicating whether a given selector exists within the
 -- | current element.
