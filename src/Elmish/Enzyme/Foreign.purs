@@ -4,12 +4,12 @@
 -- | convenient API, use `Elmish.Enzyme` instead.
 module Elmish.Enzyme.Foreign
   ( Wrapper, NodeMultiplicity, SingleNode, ManyNodes
+  , configure
   , mount
   , mountComponent
   , at
   , childAt
   , children
-  , configure
   , count
   , debug
   , exists
