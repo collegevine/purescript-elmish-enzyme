@@ -117,9 +117,15 @@ find selector w = liftEffect $ runEffectFn2 find_ selector w
 parent :: forall m n. MonadEffect m => Wrapper n -> m (Wrapper n)
 parent w = liftEffect $ runEffectFn1 parent_ w
 
+-- | Returns the child nodes of the given `Wrapper`. See
+-- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/children.html ffor
+-- | more info.
 children :: forall m n. MonadEffect m => Wrapper n -> m (Wrapper ManyNodes)
 children w = liftEffect $ runEffectFn1 children_ w
 
+-- | Returns the child node at index `idx` of the given `Wrapper`. See
+-- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/childAt.html ffor
+-- | more info.
 childAt :: forall m n. MonadEffect m => Int -> Wrapper n -> m (Wrapper SingleNode)
 childAt idx w = liftEffect $ runEffectFn2 childAt_ idx w
 

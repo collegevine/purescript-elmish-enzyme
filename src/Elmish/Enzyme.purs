@@ -179,6 +179,13 @@ debug = E.debug =<< ask
 trace :: forall n. DebugWarning => EnzymeM n Unit
 trace = log =<< debug
 
+-- | Logs a string representing the DOM tree of the current element(s) and
+-- | returns the original `Wrapper`, so that it can be used in a `withElementM`
+-- | chain, like so:
+-- |
+-- | ```purs
+-- | spy >> find "foo" >> spy >> childAt 0 >> spy >> text >>= shouldEqual "Foo"
+-- | ```
 spy :: forall n. DebugWarning => EnzymeM n (Wrapper n)
 spy = ask <* trace
 
@@ -219,9 +226,15 @@ find selector = do
 parent :: forall n. EnzymeM n (Wrapper n)
 parent = E.parent =<< ask
 
+-- | Returns the child nodes of the current `Wrapper`. See
+-- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/children.html ffor
+-- | more info.
 children :: forall n. EnzymeM n (Wrapper ManyNodes)
 children = E.children =<< ask
 
+-- | Returns the child node at index `idx` of the current `Wrapper`. See
+-- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/childAt.html ffor
+-- | more info.
 childAt :: forall n. Int -> EnzymeM n (Wrapper SingleNode)
 childAt n = E.childAt n =<< ask
 
