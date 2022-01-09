@@ -67,9 +67,11 @@
 -- | from JavaScript, as well as other similar testing libraries, sych as
 -- | Capybara.
 module Elmish.Enzyme
-  ( EnzymeM
-  , testComponent, testElement
+  ( (>>)
+  , EnzymeM
   , at
+  , childAt
+  , children
   , clickOn
   , count
   , debug
@@ -80,22 +82,28 @@ module Elmish.Enzyme
   , is
   , length
   , mapEach
+  , module ForeignExports
   , name
   , parent
   , prop
-  , simulate, simulate', simulateCustom'
+  , simulate
+  , simulate'
+  , simulateCustom'
   , state
+  , testComponent
+  , testElement
   , text
   , toArray
   , trace
   , unsafeSetState
   , update
-  , waitUntil, waitUntil'
-  , waitWhile, waitWhile'
-  , withElement, withElementM
+  , waitUntil
+  , waitUntil'
+  , waitWhile
+  , waitWhile'
+  , withElement
+  , withElementM
   , withSelector
-  , (>>)
-  , module ForeignExports
   ) where
 
 import Prelude
@@ -206,6 +214,12 @@ find selector = do
 -- | info.
 parent :: forall n. EnzymeM n (Wrapper n)
 parent = E.parent =<< ask
+
+children :: forall n. EnzymeM n (Wrapper ManyNodes)
+children = E.children =<< ask
+
+childAt :: forall n. Int -> EnzymeM n (Wrapper SingleNode)
+childAt n = E.childAt n =<< ask
 
 -- | Returns a `Boolean` indicating whether the current element matches
 -- | the given selector.

@@ -3,18 +3,23 @@
 -- | wrapper around Enzyme with a few convenience functions added. For a
 -- | convenient API, use `Elmish.Enzyme` instead.
 module Elmish.Enzyme.Foreign
-  ( Wrapper, NodeMultiplicity, SingleNode, ManyNodes
+  ( ManyNodes
+  , NodeMultiplicity
+  , SingleNode
+  , Wrapper
+  , at
+  , childAt
+  , children
   , configure
   , count
-  , mount
-  , mountComponent
-  , at
   , debug
   , exists
   , find
   , forEach
   , is
   , length
+  , mount
+  , mountComponent
   , name
   , parent
   , prop
@@ -111,6 +116,12 @@ find selector w = liftEffect $ runEffectFn2 find_ selector w
 -- | more info.
 parent :: forall m n. MonadEffect m => Wrapper n -> m (Wrapper n)
 parent w = liftEffect $ runEffectFn1 parent_ w
+
+children :: forall m n. MonadEffect m => Wrapper n -> m (Wrapper ManyNodes)
+children w = liftEffect $ runEffectFn1 children_ w
+
+childAt :: forall m n. MonadEffect m => Int -> Wrapper n -> m (Wrapper SingleNode)
+childAt idx w = liftEffect $ runEffectFn2 childAt_ idx w
 
 -- | Returns a `Boolean` indicating whether the given `Wrapper` matches
 -- | the given selector.
@@ -224,6 +235,10 @@ foreign import exists_ :: forall n. EffectFn2 String (Wrapper n) Boolean
 foreign import find_ :: forall n. EffectFn2 String (Wrapper n) (Wrapper ManyNodes)
 
 foreign import parent_ :: forall n. EffectFn1 (Wrapper n) (Wrapper n)
+
+foreign import children_ :: forall n. EffectFn1 (Wrapper n) (Wrapper ManyNodes)
+
+foreign import childAt_ :: forall n. EffectFn2 Int (Wrapper n) (Wrapper SingleNode)
 
 foreign import is_ :: EffectFn2 String (Wrapper SingleNode) Boolean
 

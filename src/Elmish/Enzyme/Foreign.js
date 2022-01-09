@@ -16,6 +16,10 @@ exports.find_ = (selector, wrapper) => wrapper.find(selector)
 
 exports.parent_ = wrapper => wrapper.parent()
 
+exports.children_ = wrapper => wrapper.children()
+
+exports.childAt_ = (idx, wrapper) => wrapper.childAt(idx)
+
 exports.is_ = (selector, wrapper) => wrapper.is(selector)
 
 exports.length = wrapper => wrapper.length
