@@ -67,8 +67,8 @@
 -- | from JavaScript, as well as other similar testing libraries, sych as
 -- | Capybara.
 module Elmish.Enzyme
-  ( (>>)
-  , EnzymeM
+  ( EnzymeM
+  , testComponent, testElement
   , at
   , childAt
   , children
@@ -82,29 +82,23 @@ module Elmish.Enzyme
   , is
   , length
   , mapEach
-  , module ForeignExports
   , name
   , parent
   , prop
-  , simulate
-  , simulate'
-  , simulateCustom'
+  , simulate, simulate', simulateCustom'
   , spy
   , state
-  , testComponent
-  , testElement
   , text
   , toArray
   , trace
   , unsafeSetState
   , update
-  , waitUntil
-  , waitUntil'
-  , waitWhile
-  , waitWhile'
-  , withElement
-  , withElementM
+  , waitUntil, waitUntil'
+  , waitWhile, waitWhile'
+  , withElement, withElementM
   , withSelector
+  , (>>)
+  , module ForeignExports
   ) where
 
 import Prelude
