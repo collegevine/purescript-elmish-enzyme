@@ -20,12 +20,12 @@
         "purescript-debug": "^v5.0.0",
         "purescript-effect": "^v3.0.0",
         "purescript-elmish": "^v0.5.6",
-        "purescript-exceptions": "^v5.0.0",
         "purescript-foldable-traversable": "^v5.0.1",
         "purescript-foreign": "^v6.0.1",
         "purescript-functions": "^v5.0.0",
         "purescript-prelude": "^v5.0.1",
         "purescript-psci-support": "^v5.0.0",
-        "purescript-transformers": "^v5.2.0"
+        "purescript-transformers": "^v5.2.0",
+        "purescript-unsafe-coerce": "^v5.0.0"
     }
 }
