@@ -220,13 +220,16 @@ find selector = do
 parent :: forall n. EnzymeM n (Wrapper n)
 parent = E.parent =<< ask
 
--- | Returns the child nodes of the current `Wrapper`. See
--- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/children.html ffor
+-- | Returns the child nodes of the current `Wrapper`. When the current context
+-- | contains multiple elements, the result will contain the children of each
+-- | element. See
+-- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/children.html for
 -- | more info.
 children :: forall n. EnzymeM n (Wrapper ManyNodes)
 children = E.children =<< ask
 
--- | Returns the child node at index `idx` of the current `Wrapper`. See
+-- | Returns the child node at index `idx` of the current `Wrapper`.`childAt n`
+-- | is equivalent to `children >> at n` See
 -- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/childAt.html ffor
 -- | more info.
 childAt :: forall n. Int -> EnzymeM n (Wrapper SingleNode)

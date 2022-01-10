@@ -7,7 +7,7 @@ import Effect (Effect)
 import Effect.Aff (launchAff_, message, try)
 import Elmish ((<?|))
 import Elmish.Component (ComponentDef)
-import Elmish.Enzyme (at, clickOn, exists, findAll, find, length, prop, simulate', testComponent, testElement, text, (>>))
+import Elmish.Enzyme (at, children, clickOn, exists, find, findAll, length, mapEach, prop, simulate', testComponent, testElement, text, (>>))
 import Elmish.Enzyme as Enzyme
 import Elmish.Enzyme.Adapter as Adapter
 import Elmish.Foreign (readForeign)
@@ -81,6 +81,26 @@ spec = do
           prop "value" >>= shouldEqual ""
           simulate' "change" { target: { value: "New text" } }
         find ".baz" >> prop "value" >>= shouldEqual "New text"
+
+  describe "children" do
+    let
+      elem =
+        H.div ""
+        [ H.div_ "" { id: "foo" } H.empty
+        , H.div_ "" { id: "bar" } $ H.div_ "" { id: "bar-child" } H.empty
+        , H.div_ "" { id: "baz" }
+          [ H.div_ "" { id: "baz-child-1" } H.empty
+          , H.div_ "" { id: "baz-child-2" } H.empty
+          ]
+        ]
+
+    it "returns a wrapper containing the child nodes" $
+      testElement elem $
+        children >> mapEach (prop "id") >>= shouldEqual ["foo", "bar", "baz"]
+
+    it "returns children of each node when called on many nodes" $
+      testElement elem $
+        children >> children >> mapEach (prop "id") >>= shouldEqual ["bar-child", "baz-child-1", "baz-child-2"]
 
 -- Test Component
 
