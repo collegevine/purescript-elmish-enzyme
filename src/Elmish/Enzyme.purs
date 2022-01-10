@@ -70,6 +70,8 @@ module Elmish.Enzyme
   ( EnzymeM
   , testComponent, testElement
   , at
+  , childAt
+  , children
   , clickOn
   , count
   , debug
@@ -84,6 +86,7 @@ module Elmish.Enzyme
   , parent
   , prop
   , simulate, simulate', simulateCustom'
+  , spy
   , state
   , text
   , toArray
@@ -170,6 +173,16 @@ debug = E.debug =<< ask
 trace :: forall n. DebugWarning => EnzymeM n Unit
 trace = log =<< debug
 
+-- | Logs a string representing the DOM tree of the current element(s) and
+-- | returns the original `Wrapper`, so that it can be used in a `withElementM`
+-- | chain, like so:
+-- |
+-- | ```purs
+-- | spy >> find "foo" >> spy >> childAt 0 >> spy >> text >>= shouldEqual "Foo"
+-- | ```
+spy :: forall n. DebugWarning => EnzymeM n (Wrapper n)
+spy = ask <* trace
+
 -- | Returns a `Boolean` indicating whether a given selector exists within the
 -- | current element.
 -- | See https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/exists.html
@@ -206,6 +219,21 @@ find selector = do
 -- | info.
 parent :: forall n. EnzymeM n (Wrapper n)
 parent = E.parent =<< ask
+
+-- | Returns the child nodes of the current `Wrapper`. When the current context
+-- | contains multiple elements, the result will contain the children of each
+-- | element. See
+-- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/children.html for
+-- | more info.
+children :: forall n. EnzymeM n (Wrapper ManyNodes)
+children = E.children =<< ask
+
+-- | Returns the child node at index `idx` of the current `Wrapper`.`childAt n`
+-- | is equivalent to `children >> at n` See
+-- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/childAt.html ffor
+-- | more info.
+childAt :: forall n. Int -> EnzymeM n (Wrapper SingleNode)
+childAt n = E.childAt n =<< ask
 
 -- | Returns a `Boolean` indicating whether the current element matches
 -- | the given selector.

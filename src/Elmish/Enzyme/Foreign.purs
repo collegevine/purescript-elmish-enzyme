@@ -5,10 +5,12 @@
 module Elmish.Enzyme.Foreign
   ( Wrapper, NodeMultiplicity, SingleNode, ManyNodes
   , configure
-  , count
   , mount
   , mountComponent
   , at
+  , childAt
+  , children
+  , count
   , debug
   , exists
   , find
@@ -111,6 +113,18 @@ find selector w = liftEffect $ runEffectFn2 find_ selector w
 -- | more info.
 parent :: forall m n. MonadEffect m => Wrapper n -> m (Wrapper n)
 parent w = liftEffect $ runEffectFn1 parent_ w
+
+-- | Returns the child nodes of the given `Wrapper`. See
+-- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/children.html ffor
+-- | more info.
+children :: forall m n. MonadEffect m => Wrapper n -> m (Wrapper ManyNodes)
+children w = liftEffect $ runEffectFn1 children_ w
+
+-- | Returns the child node at index `idx` of the given `Wrapper`. See
+-- | https://enzymejs.github.io/enzyme/docs/api/ReactWrapper/childAt.html ffor
+-- | more info.
+childAt :: forall m n. MonadEffect m => Int -> Wrapper n -> m (Wrapper SingleNode)
+childAt idx w = liftEffect $ runEffectFn2 childAt_ idx w
 
 -- | Returns a `Boolean` indicating whether the given `Wrapper` matches
 -- | the given selector.
@@ -224,6 +238,10 @@ foreign import exists_ :: forall n. EffectFn2 String (Wrapper n) Boolean
 foreign import find_ :: forall n. EffectFn2 String (Wrapper n) (Wrapper ManyNodes)
 
 foreign import parent_ :: forall n. EffectFn1 (Wrapper n) (Wrapper n)
+
+foreign import children_ :: forall n. EffectFn1 (Wrapper n) (Wrapper ManyNodes)
+
+foreign import childAt_ :: forall n. EffectFn2 Int (Wrapper n) (Wrapper SingleNode)
 
 foreign import is_ :: EffectFn2 String (Wrapper SingleNode) Boolean
 
