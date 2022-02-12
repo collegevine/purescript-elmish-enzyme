@@ -1,4 +1,6 @@
-exports.adapter = (pkg) => () => {
-  const Adapter = require(pkg)
-  return new Adapter()
+export function adapterImpl(pkg) {
+  return () => {
+    const Adapter = import(pkg)
+    return Adapter.then(a => new a())
+  };
 }

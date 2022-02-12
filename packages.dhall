@@ -99,6 +99,39 @@ in  upstream
 -------------------------------
 -}
 let upstream =
-      https://github.com/purescript/package-sets/releases/download/psc-0.14.5-20211116/packages.dhall sha256:7ba810597a275e43c83411d2ab0d4b3c54d0b551436f4b1632e9ff3eb62e327a
+      https://raw.githubusercontent.com/working-group-purescript-es/package-sets/main/packages.dhall
+        sha256:1b5f889d47d12745a0652322ecc5b83baea51a42a35cc8b9988a64914aeb2b2f
 
 in  upstream
+  with elmish =
+    { repo =
+        "https://github.com/working-group-purescript-es/purescript-elmish.git"
+    , dependencies =
+      [ "aff"
+      , "argonaut-core"
+      , "arrays"
+      , "bifunctors"
+      , "console"
+      , "debug"
+      , "effect"
+      , "either"
+      , "foldable-traversable"
+      , "foreign"
+      , "foreign-object"
+      , "functions"
+      , "integers"
+      , "js-date"
+      , "maybe"
+      , "nullable"
+      , "partial"
+      , "prelude"
+      , "refs"
+      , "strings"
+      , "typelevel-prelude"
+      , "unsafe-coerce"
+      , "web-dom"
+      , "web-html"
+      ]
+    , version = "es-modules"
+    }
+  with metadata.version = "v0.15.0"

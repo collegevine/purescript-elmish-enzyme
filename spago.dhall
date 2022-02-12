@@ -13,6 +13,7 @@ to generate this file without the comments in this block.
 { name = "elmish-enzyme"
 , dependencies =
   [ "aff"
+  , "aff-promise"
   , "arrays"
   , "console"
   , "debug"

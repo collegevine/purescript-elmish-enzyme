@@ -20,9 +20,9 @@ import Test.Spec.Runner (runSpec)
 foreign import _configureJsDomViaFfi :: Type
 
 main :: Effect Unit
-main = do
+main = launchAff_ $ do
   Enzyme.configure Adapter.unofficialReact_17
-  launchAff_ $ runSpec [specReporter] spec
+  runSpec [specReporter] spec
 
 spec :: Spec Unit
 spec = do
