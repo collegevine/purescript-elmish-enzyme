@@ -100,7 +100,7 @@ in  upstream
 -}
 let upstream =
       https://raw.githubusercontent.com/working-group-purescript-es/package-sets/main/packages.dhall
-        sha256:1b5f889d47d12745a0652322ecc5b83baea51a42a35cc8b9988a64914aeb2b2f
+        sha256:745cc53dc77cd7d91b8fa8d657133c5442352551ac5afde3d6960bc09772cf03
 
 in  upstream
   with elmish =
