@@ -103,35 +103,4 @@ let upstream =
         sha256:745cc53dc77cd7d91b8fa8d657133c5442352551ac5afde3d6960bc09772cf03
 
 in  upstream
-  with elmish =
-    { repo =
-        "https://github.com/working-group-purescript-es/purescript-elmish.git"
-    , dependencies =
-      [ "aff"
-      , "argonaut-core"
-      , "arrays"
-      , "bifunctors"
-      , "console"
-      , "debug"
-      , "effect"
-      , "either"
-      , "foldable-traversable"
-      , "foreign"
-      , "foreign-object"
-      , "functions"
-      , "integers"
-      , "js-date"
-      , "maybe"
-      , "nullable"
-      , "partial"
-      , "prelude"
-      , "refs"
-      , "strings"
-      , "typelevel-prelude"
-      , "unsafe-coerce"
-      , "web-dom"
-      , "web-html"
-      ]
-    , version = "es-modules"
-    }
   with metadata.version = "v0.15.0"
