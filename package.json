@@ -25,7 +25,7 @@
   "devDependencies": {
     "@wojtekmaj/enzyme-adapter-react-17": "^0.6.6",
     "purescript": "^0.15.0",
-    "spago": "^0.20.3"
+    "spago": "^0.20.8"
   },
   "dependencies": {
     "enzyme": "^3.11.0",
