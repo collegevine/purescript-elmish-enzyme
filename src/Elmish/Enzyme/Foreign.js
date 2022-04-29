@@ -1,32 +1,52 @@
-const Enzyme = require('enzyme')
+import Enzyme from 'enzyme';
 
-exports.configure_ = (adapter) => {
+export function configure_(adapter) {
   Enzyme.configure({ adapter: adapter() })
 }
 
-exports.mount_ = Enzyme.mount
+export var mount_ = Enzyme.mount;
 
-exports.at_ = (index, wrapper) => wrapper.at(index)
+export function at_(index, wrapper) {
+  return wrapper.at(index);
+}
 
-exports.debug_ = (wrapper) => wrapper.debug()
+export function debug_(wrapper) {
+  return wrapper.debug();
+}
 
-exports.exists_ = (selector, wrapper) => wrapper.exists(selector)
+export function exists_(selector, wrapper) {
+  return wrapper.exists(selector);
+}
 
-exports.find_ = (selector, wrapper) => wrapper.find(selector)
+export function find_(selector, wrapper) {
+  return wrapper.find(selector);
+}
 
-exports.parent_ = wrapper => wrapper.parent()
+export function parent_(wrapper) {
+  return wrapper.parent();
+}
 
-exports.children_ = wrapper => wrapper.children()
+export function children_(wrapper) {
+  return wrapper.children();
+}
 
-exports.childAt_ = (idx, wrapper) => wrapper.childAt(idx)
+export function childAt_(idx, wrapper) {
+  return wrapper.childAt(idx);
+}
 
-exports.is_ = (selector, wrapper) => wrapper.is(selector)
+export function is_(selector, wrapper) {
+  return wrapper.is(selector);
+}
 
-exports.length = wrapper => wrapper.length
+export function length(wrapper) {
+  return wrapper.length;
+}
 
-exports.prop_ = (key, wrapper) => wrapper.prop(key)
+export function prop_(key, wrapper) {
+  return wrapper.prop(key);
+}
 
-exports.unsafeSetState_ = (newState, wrapper) => {
+export function unsafeSetState_(newState, wrapper) {
   return (_onError, onSuccess) => {
     wrapper.setState(newState, onSuccess)
 
@@ -36,16 +56,30 @@ exports.unsafeSetState_ = (newState, wrapper) => {
   }
 }
 
-exports.simulate_ = (eventType, event, wrapper) => wrapper.simulate(eventType, event)
+export function simulate_(eventType, event, wrapper) {
+  return wrapper.simulate(eventType, event);
+}
 
-exports.simulateCustom_ = (eventType, event, wrapper) => wrapper.getElement().props[eventType](event)
+export function simulateCustom_(eventType, event, wrapper) {
+  return wrapper.getElement().props[eventType](event);
+}
 
-exports.state_ = (wrapper) => wrapper.state()
+export function state_(wrapper) {
+  return wrapper.state();
+}
 
-exports.text_ = (wrapper) => wrapper.text()
+export function text_(wrapper) {
+  return wrapper.text();
+}
 
-exports.name_ = (wrapper) => wrapper.name()
+export function name_(wrapper) {
+  return wrapper.name();
+}
 
-exports.unmount_ = (wrapper) => wrapper.unmount()
+export function unmount_(wrapper) {
+  return wrapper.unmount();
+}
 
-exports.update_ = (wrapper) => wrapper.update()
+export function update_(wrapper) {
+  return wrapper.update();
+}

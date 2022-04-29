@@ -13,6 +13,7 @@ to generate this file without the comments in this block.
 { name = "elmish-enzyme"
 , dependencies =
   [ "aff"
+  , "aff-promise"
   , "arrays"
   , "console"
   , "debug"
@@ -24,6 +25,7 @@ to generate this file without the comments in this block.
   , "prelude"
   , "psci-support"
   , "transformers"
+  , "undefined-is-not-a-problem"
   , "unsafe-coerce"
   ]
 , packages = ./packages.dhall
