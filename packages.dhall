@@ -1,11 +1,11 @@
 let upstream =
-      https://github.com/purescript/package-sets/releases/download/psc-0.15.0-20220429/packages.dhall
-        sha256:03c682bff56fc8f9d8c495ffcc6f524cbd3c89fe04778f965265c08757de8c9d
+      https://github.com/purescript/package-sets/releases/download/psc-0.15.0/packages.dhall
+        sha256:8734be21e7049edeb49cc599e968e965442dad70e3e3c65a5c2d1069ec781d02
+
 in  upstream
   with elmish =
-    { repo =
-        "https://github.com/working-group-purescript-es/purescript-elmish.git"
-    , version = "v0.15.0-update"
+    { repo = "https://github.com/collegevine/purescript-elmish.git"
+    , version = "v0.8.0"
     , dependencies =
       [ "aff"
       , "argonaut-core"
@@ -37,10 +37,11 @@ in  upstream
   with elmish-html =
     { dependencies = [ "prelude", "record" ]
     , repo = "https://github.com/collegevine/purescript-elmish-html.git"
-    , version = "v0.6.0"
+    , version = "v0.7.0"
     }
   with undefined-is-not-a-problem =
-    { repo = "https://github.com/working-group-purescript-es/purescript-undefined-is-not-a-problem.git"
+    { repo =
+        "https://github.com/working-group-purescript-es/purescript-undefined-is-not-a-problem.git"
     , version = "v0.15.0-update"
     , dependencies =
       [ "assert"
@@ -56,6 +57,7 @@ in  upstream
     }
   with debug =
     { dependencies = [ "prelude", "functions" ]
-    , repo = "https://github.com/working-group-purescript-es/purescript-debug.git"
+    , repo =
+        "https://github.com/working-group-purescript-es/purescript-debug.git"
     , version = "es-modules"
     }
