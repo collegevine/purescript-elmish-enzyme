@@ -1,0 +1,30 @@
+package:
+  name: elmish-enzyme
+  description: A testing library for Elmish which uses Enzyme
+  publish:
+    version: 0.1.2
+    license: MIT
+    location:
+      githubOwner: collegevine
+      githubRepo: purescript-elmish-enzyme
+  dependencies:
+    - aff: ">=7.0.0 <9.0.0"
+    - aff-promise: ">=4.0.0 <5.0.0"
+    - arrays: ">=7.0.0 <8.0.0"
+    - console: ">=6.0.0 <7.0.0"
+    - debug: ">=6.0.0 <7.0.0"
+    - effect: ">=4.0.0 <5.0.0"
+    - elmish: ">=0.8.1 <0.14.0"
+    - foldable-traversable: ">=6.0.0 <7.0.0"
+    - foreign: ">=7.0.0 <8.0.0"
+    - functions: ">=6.0.0 <7.0.0"
+    - prelude: ">=6.0.0 <7.0.0"
+    - transformers: ">=6.0.0 <7.0.0"
+    - unsafe-coerce: ">=6.0.0 <7.0.0"
+  test:
+    main: Test.Main
+    dependencies:
+      - either: ">=6.0.0 <7.0.0"
+      - elmish-html: ">=0.9.0 <0.10.0"
+      - spec: ">=8.0.0 <9.0.0"
+workspace: {}

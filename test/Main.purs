@@ -6,12 +6,12 @@ import Data.Either (Either(..))
 import Effect (Effect)
 import Effect.Class (liftEffect)
 import Effect.Aff (launchAff_, message, try)
-import Elmish ((<?|))
+import Elmish ((<|))
 import Elmish.Component (ComponentDef)
 import Elmish.Enzyme (at, children, clickOn, exists, find, findAll, length, mapEach, prop, simulate', testComponent, testElement, text, (>>))
 import Elmish.Enzyme as Enzyme
 import Elmish.Enzyme.Adapter as Adapter
-import Elmish.Foreign (readForeign)
+import Elmish.HTML.Events (inputText)
 import Elmish.HTML.Styled as H
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (fail, shouldEqual)
@@ -134,13 +134,10 @@ def =
           H.div "bar" "Bar"
         else
           H.empty
-      , H.button_ "toggle-bar" { onClick: dispatch ToggleBar } "Hide Bar"
+      , H.button_ "toggle-bar" { onClick: dispatch <| ToggleBar } "Hide Bar"
       , H.input_ "baz"
-          { onChange: dispatch <?| (map (ChangeBaz <<< _.target.value) <<< toEvent)
+          { onChange: dispatch <| ChangeBaz <<< inputText
           , value: s.baz
           }
       ]
   }
-  where
-    toEvent :: _ -> _ { target :: { value :: String } }
-    toEvent = readForeign

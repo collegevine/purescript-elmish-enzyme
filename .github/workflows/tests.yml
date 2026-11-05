@@ -13,15 +13,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/cache@v2
+    - uses: actions/cache@v4
       with:
         path: |
           .spago
           output
           node_modules
-        key: build-atrifacts-v1-${{ hashFiles('package-lock.json', 'spago.dhall', 'packages.dhall') }}
+        key: build-atrifacts-v1-${{ hashFiles('package-lock.json', 'spago.yaml') }}
     - uses: actions/setup-node@v1
       with:
-        node-version: 14.19.1
+        node-version: 22
     - run: npm i
     - run: npm test
